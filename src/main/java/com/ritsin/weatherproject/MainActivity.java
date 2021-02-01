@@ -25,7 +25,9 @@ import java.net.MalformedURLException;
 
 public class MainActivity extends AppCompatActivity {
     String zipcode = "";
-
+    
+    /* Declaring all widgets */
+    
     EditText zip;
     Button go;
 
@@ -77,13 +79,15 @@ public class MainActivity extends AppCompatActivity {
 
     TextView HrForecast;
     ImageView EZCImage;
-
+    
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
+        /* Connecting all widget objects with the actual widget on the UI */
+        
         zip = findViewById(R.id.id_editZip);
         go = findViewById(R.id.id_go);
 
@@ -128,7 +132,8 @@ public class MainActivity extends AppCompatActivity {
         WeatherHour5High = findViewById(R.id.id_weatherhour5high);
 
         Location = findViewById(R.id.id_location);
-
+        
+        /* Creating an arraylist of quotes for different weathers */
         quotes = new ArrayList<String>();
         quotes.add("The girl told me Take off your jacket, I said Babes, man's not hot");//Sunny 0
         quotes.add("My lies right now are falling like the rain, So let the river run");//Rain 1
@@ -136,7 +141,8 @@ public class MainActivity extends AppCompatActivity {
         quotes.add("Rain on 'em, thunderstorm, rain on 'em");//Thunderstorm 3
         quotes.add("I see the clouds from my window, I pray the sun gon' shine this way");//Cloudy 4
         quotes.add("Legend says Syre still exists in the mist, in the fog");//Fog/Haze/Mist 5
-
+        
+        /* Creating an arrayList which contains the people who said the corresponding quote */
         artistList = new ArrayList<String>();
         artistList.add("(Mans Not Hot - Big Shaq)");//0
         artistList.add("(River - Eminem)");//1
@@ -153,7 +159,9 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-
+        /* Setting all weather images to invisible since 
+        they are not required for the starting screen */
+        
         WeatherCurrentImage.setVisibility(View.INVISIBLE);
         weatherImage1.setVisibility(View.INVISIBLE);
         weatherImage2.setVisibility(View.INVISIBLE);
@@ -161,12 +169,14 @@ public class MainActivity extends AppCompatActivity {
         weatherImage4.setVisibility(View.INVISIBLE);
         weatherImage5.setVisibility(View.INVISIBLE);
         HrForecast.setVisibility(View.INVISIBLE);
-
-
+    
+        
+        /* When the go button is clicked */
         go.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 zipcode = zip.getText().toString();
+                /* Creating a thread to the weather API */
                 AsyncThread weaThread = new AsyncThread();
                 weaThread.execute(zipcode);
             }
@@ -175,7 +185,8 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
-
+     
+     /* The class cotaining the code for connecting and retriving data from the OpenWeatherAPI */    
      public class AsyncThread extends AsyncTask<String,Void,Void>{
 
          JSONObject weather;
@@ -185,15 +196,19 @@ public class MainActivity extends AppCompatActivity {
          protected Void doInBackground(String... strings) {
 
              try {
+                 /* Opening a connecting to the correct weather forcast URL for the zipcode entered */
                  URL keyForecast = new URL("http://api.openweathermap.org/data/2.5/forecast?zip="+strings[0]+"&APPID=5b6b4c7e300358ddb78ad9704d4d9e2d");
                  URLConnection connection = keyForecast.openConnection();
                  BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                 /* Reading the data from the corresponding weather forecast JSON object */
                  weather = new JSONObject(reader.readLine());
                  reader.close();
-
+                 
+                 /* Opening a connecting to the correct current weather URL for the zipcode entered */
                  URL keyCurrent = new URL("http://api.openweathermap.org/data/2.5/weather?zip="+strings[0]+"&APPID=5b6b4c7e300358ddb78ad9704d4d9e2d");
                  URLConnection connectionCurrent = keyCurrent.openConnection();
                  BufferedReader readerCurrent = new BufferedReader(new InputStreamReader(connectionCurrent.getInputStream()));
+                 /* Reading the data from the corresponding current weather JSON object */
                  weatherCurrent = new JSONObject(readerCurrent.readLine());
                  readerCurrent.close();
 
@@ -222,7 +237,8 @@ public class MainActivity extends AppCompatActivity {
                  WeatherCurrentMain.setText(weatherCurrent.getJSONArray("weather").getJSONObject(0).getString("main"));
                  WeatherCurrentDesc.setText(weatherCurrent.getJSONArray("weather").getJSONObject(0).getString("description"));
                  WeatherCurrentTemp.setText(getTemp(weatherCurrent.getJSONObject("main").getDouble("temp"))+" F");
-                 //Log.d("TAAAG",weatherCurrent.getJSONArray("weather").getJSONObject(0).getString("main"));
+                 /* Setting the correct widgets for each different weather type (Clouds, Haze, Mist, Clear, Rain, Thunderstorm, Fog) */
+                 
                  if (weatherCurrent.getJSONArray("weather").getJSONObject(0).getString("main").equals("Clouds")) {
                      WeatherCurrentImage.setImageResource(R.drawable.cloudy);
                      WeatherCurrentImage.setVisibility(View.VISIBLE);
@@ -275,7 +291,7 @@ public class MainActivity extends AppCompatActivity {
                  e.printStackTrace();
              }
 
-             //Forecast 1
+             //Forecast 1 ( The first box in the 15 hour forecast scroll )
              try {
                  WeatherMainHour1.setText(weatherCurrent.getJSONArray("weather").getJSONObject(0).getString("main"));
                  WeatherHour1Desc.setText(weatherCurrent.getJSONArray("weather").getJSONObject(0).getString("description"));
@@ -320,7 +336,7 @@ public class MainActivity extends AppCompatActivity {
              }
              //Forecast 1 End
 
-             //Forecast 2
+             //Forecast 2 ( The second box in the 15 hour forecast scroll )
              try {
                  WeatherMainHour2.setText(weather.getJSONArray("list").getJSONObject(1).getJSONArray("weather").getJSONObject(0).getString("main"));
                  //First is array second is obj, third is an array, 4th is an object, then String/Int/etc.
@@ -365,7 +381,7 @@ public class MainActivity extends AppCompatActivity {
              }
              //Forecast 2 End
 
-             //Forecast 3
+             //Forecast 3 ( The third box in the 15 hour forecast scroll )
              try {
                  WeatherMainHour3.setText(weather.getJSONArray("list").getJSONObject(2).getJSONArray("weather").getJSONObject(0).getString("main"));
                  //First is array second is obj, third is an array, 4th is an object, then String/Int/etc.
@@ -410,7 +426,7 @@ public class MainActivity extends AppCompatActivity {
              }
              //Forecast 3 End
 
-             //Forecast 4
+             //Forecast 4 ( The fourth box in the 15 hour forecast scroll )
              try {
                  WeatherMainHour4.setText(weather.getJSONArray("list").getJSONObject(3).getJSONArray("weather").getJSONObject(0).getString("main"));
                  //First is array second is obj, third is an array, 4th is an object, then String/Int/etc.
@@ -455,7 +471,7 @@ public class MainActivity extends AppCompatActivity {
              }
              //Forecast 4 End
 
-             //Forecast 5
+             //Forecast 5 ( The fifth box in the 15 hour forecast scroll )
              try {
                  WeatherMainHour5.setText(weather.getJSONArray("list").getJSONObject(4).getJSONArray("weather").getJSONObject(0).getString("main"));
                  //First is array second is obj, third is an array, 4th is an object, then String/Int/etc.
@@ -502,15 +518,14 @@ public class MainActivity extends AppCompatActivity {
 
 
             }catch (Exception e){
-             //zip.setText("Enter a Valid Zip Code!!");
+             // Error Catch for invalid zip code
              Toast.makeText(getApplicationContext(),"Enter A Valid Zip Code",Toast.LENGTH_LONG).show();
          }
          }
-
+        
+         /* Method to get the current time */
          public String getTime(String dtText){
-             //2018-01-03 15:00:00
-             //0123456789012345678
-
+         
              String time = dtText.substring(11,13);
              String finalTime = "";
              if(time.equals("00")){
@@ -539,14 +554,12 @@ public class MainActivity extends AppCompatActivity {
              }
              return finalTime;
          }
-
+         
+         /* Method to get the Unix Time */
          public String getUnixTime(int dtText){
-             //java.util.Date time=new java.util.Date((long)timeStamp*1000);
+             
              java.util.Date time=new java.util.Date((long)dtText*1000);
              String Time = time.toString();
-             //Log.d("UNIXTIME",Time);
-             //Mon Jan 08 16:24:00 EST 2018
-             //0123456789012345678901234567
 
              String month = Time.substring(4,7);
              if(month.equals("Jan")){
@@ -586,11 +599,8 @@ public class MainActivity extends AppCompatActivity {
                  month = "12";
              }
 
-             //Mon Jan 08 16:24:00 EST 2018
-             //0123456789012345678901234567
              String Day = " ";
              int day = Integer.parseInt(Time.substring(8,10));
-             //Log.d("UNIXTIME","DayInt: "+day);
              for(int i = 0; i < 32; i++){
                  if(day < 10 && day == i){
                      Day = "0"+i;
@@ -599,14 +609,9 @@ public class MainActivity extends AppCompatActivity {
                      Day = ""+i;
                  }
              }
-             //Log.d("UNIXTIME","Day: "+Day);
 
              String year = Time.substring(26,28);
              String date = month+"/"+Day+"/"+year;
-             //Log.d("UNIXTIME","Date: "+date);
-
-             //Mon Jan 08 16:24:00 EST 2018
-             //0123456789012345678901234567
 
              int Unixhour = Integer.parseInt(Time.substring(11,13));
              String hrPeriod = "";
@@ -632,18 +637,14 @@ public class MainActivity extends AppCompatActivity {
                      }
                  }
              }
-             //Log.d("UNIXTIME","Hour: "+hour);
              String min = Time.substring(14,16);
              String finaltime = hour+":"+min+" "+hrPeriod;
-             //Log.d("UNIXTIME","Time: "+finaltime);
 
              String finalDate = date+" "+finaltime;
              return  finalDate;
          }
-
+         /* Methond to get the date */
          public String getDate(String dtText){
-             //2018-01-03 15:00:00
-             //0123456789012345678
 
              String month = dtText.substring(5,7);
              String day = dtText.substring(8,10);
@@ -653,18 +654,13 @@ public class MainActivity extends AppCompatActivity {
 
              return finalDate;
          }
-
+        
+         /* Methond to get the current temp */
          public int getTemp(double temp){
-             //K×9/5-459.67
-             //Log.d("TEMP","Original: "+temp);
              double temptemp = temp*(1.8);
-             //Log.d("TEMP","Temp Temp: "+temptemp);
              double finaltemp = temptemp-459.67;
-             //Log.d("TEMP","Final Temp: "+finaltemp);
              double returntemp = Math.round(finaltemp * 100.0) / 100.0;
              String tempString = ""+returntemp;
-             //Log.d("StringTemp","Before: "+returntemp);
-             //Log.d("StringTemp","String: "+tempString);
 
              for(int i = 0; i < tempString.length(); i++){
                  if(tempString.charAt(i) == '.'){
@@ -679,17 +675,9 @@ public class MainActivity extends AppCompatActivity {
                      }
                  }
              }
-             //Log.d("StringTemp","After: "+returntemp);
              return (int)returntemp;
          }
-
-
      }
-
-
-
-
-
 }
 
 
